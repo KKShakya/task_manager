@@ -1,13 +1,14 @@
-import TaskForm from "@/components/dashboard/task-form";
-import TaskList from "@/components/dashboard/task-list";
-export default function DashboardPage() {
-  return (
-    <main className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Task Manager</h1>
-      </div>
-      <TaskForm />
-      <TaskList />
-    </main>
-  );
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    router.push(token ? "/dashboard" : "/login");
+  }, [router]);
+
+  return null;
 }

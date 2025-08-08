@@ -1,35 +1,64 @@
 const Task = require("../models/Tasks");
 
-// GET all tasks
+// GET all tasks for logged-in user
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
-    //check if task are present
-    if(!tasks || tasks.length==0){
-      res.status(200).json({message:"NO task found"});
-      return;
+    const tasks = await Task.find({ user_id: req.user._id+"" });
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(200).json({ tasks: [], message: "No task found" });
     }
-    res.json(tasks);
+
+    res.json({ tasks });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// POST new task
+// POST new task for logged-in user
 exports.createTask = async (req, res) => {
   try {
-    const task = await Task.create(req.body);
+    const taskData = {
+      ...req.body,
+      user_id: req.user._id+"", 
+    };
+
+    const task = await Task.create(taskData);
+
     res.status(201).json(task);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-// DELETE task
+// DELETE task only if it belongs to logged-in user
 exports.deleteTask = async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOne({ _id: req.params.id, user_id: req.user._id+"" });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found or unauthorized" });
+    }
+
+    await task.deleteOne();
+
     res.json({ message: "Task deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateTask = async (req, res) => {
+  try {
+    const task = await Task.findOne({ _id: req.params.id, user_id: req.user._id+"" });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found or unauthorized" });
+    }
+     task.completed = req.body.completed
+    await task.save();
+
+    res.json({ message: "Task status updated succesfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

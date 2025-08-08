@@ -1,36 +1,45 @@
-
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { apiRequest } from "@/lib/api";
 
-export default function TaskForm() {
+export default function TaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
   const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()){
-      alert("cannot be empty");
-      return
+  const handleAddTask = async () => {
+    if (!title.trim()) {
+      toast.error("Task title cannot be empty");
+      return;
     }
-    await fetch("http://localhost:4000/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
-    });
-    alert(title)
-    setTitle("");
+
+    try {
+      setLoading(true);
+      await apiRequest("/tasks", "POST", { title });
+      toast.success("Task added successfully");
+      setTitle("");
+      onTaskAdded();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to add task");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+    <div className="flex gap-2">
       <Input
-        placeholder="Enter task..."
+        placeholder="Enter task title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        className="flex-1"
       />
-      <Button type="submit">Add</Button>
-    </form>
+      <Button onClick={handleAddTask} disabled={loading}>
+        {loading ? "Adding..." : "Add"}
+      </Button>
+    </div>
   );
 }
-

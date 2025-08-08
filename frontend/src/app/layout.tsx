@@ -1,16 +1,14 @@
-import "@/app/globals.css";
-import { ReactNode } from 'react'
-import { ThemeProvider } from '@/components/theme-provider'
+// app/layout.tsx
+import "./globals.css";
+import { Toaster } from "sonner";
 
-
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <ThemeProvider defaultTheme="system" storageKey="theme">
-          {children}
-        </ThemeProvider>
+        {children}
+        <Toaster richColors position="top-center" />
       </body>
     </html>
-  )
+  );
 }

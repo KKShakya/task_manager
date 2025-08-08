@@ -1,12 +1,17 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // frontend URL
+  credentials: true                // allow cookies/auth headers if needed
+}));
 
 // Routes
 app.use("/api/tasks", require("./routes/tasksRoutes"));

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/api";
 import TaskForm from "@/components/dashboard/task-form";
-import {ThemeToggle} from "@/components/theme-toggler";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import TaskList from "@/components/dashboard/task-list";
+import { ThemeToggle } from "@/components/theme-toggler";
+import { Button } from "@/components/ui/button"; // assuming you have this or replace with your button component
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState([]);
@@ -18,33 +19,57 @@ export default function DashboardPage() {
     }
   };
 
+  const onChangeStatus = async (id: string, completed: boolean) => {
+  try {
+    await apiRequest(`/tasks/${id}`,"PATCH", {completed});
+
+    setTasks((prev) =>prev.map((task) =>task._id === id ? { ...task, completed } : task));
+  } catch (err) {
+    console.error("Failed to update status", err);
+  }
+};
+
+
   useEffect(() => {
     fetchTasks();
   }, []);
 
+  // Delete task locally without backend call
+  const handleDelete = async (taskId: string) => {
+    try {
+      const data =  await apiRequest(`/tasks/${taskId}`,"DELETE");
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
+
+  // Logout handler: clear token and redirect
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login"; // or '/' if you want
+  };
+
   return (
-    <main className="p-6 space-y-6">
+    <main className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Task Manager</h1>
-        <ThemeToggle />
+        <Button variant="outline" size="sm" onClick={handleLogout}>
+          Logout
+        </Button>
       </div>
+
+      {/* Add Task */}
       <TaskForm onTaskAdded={fetchTasks} />
-      <div className="grid gap-4">
-        {tasks.length === 0 ? (
-          <p className="text-muted-foreground">No tasks yet</p>
-        ) : (
-          tasks.map((task: any) => (
-            <Card key={task._id}>
-              <CardHeader>
-                <CardTitle>{task.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                Status: {task.completed ? "✅ Done" : "⏳ Pending"}
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+
+      {/* Task List */}
+      {tasks.length === 0 ? (
+        <p className="text-muted-foreground text-center py-6">
+          No tasks yet. Add one above 👆
+        </p>
+      ) : (
+        <TaskList tasks={tasks} onDelete={handleDelete} onChangeStatus={onChangeStatus}/>
+      )}
     </main>
   );
 }

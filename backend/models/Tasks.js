@@ -9,6 +9,9 @@ const taskSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  user_id: {
+    type: String,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
