@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/api";
 import TaskForm from "@/components/dashboard/task-form";
 import TaskList from "@/components/dashboard/task-list";
-import { ThemeToggle } from "@/components/theme-toggler";
 import { Button } from "@/components/ui/button"; // assuming you have this or replace with your button component
 
+
+type Task = {
+  _id: string;
+  completed: boolean;
+  title:string;
+};
+
 export default function DashboardPage() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = async () => {
     try {
