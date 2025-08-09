@@ -57,12 +57,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="p-6 max-w-3xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Task Manager</h1>
-        <Button variant="outline" size="sm" onClick={handleLogout}>
+    <main className="p-6 max-w-6xl mx-auto space-y-6">
+        <Button variant="outline" size="sm" className="absolute top-5 right-5" onClick={handleLogout}>
           Logout
         </Button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Task Manager</h1>
       </div>
 
       {/* Add Task */}
