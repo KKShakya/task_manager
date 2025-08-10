@@ -38,7 +38,7 @@ export default function DashboardPage() {
  const onUpdateTitle = async (id:string,title:string) =>{
   try {
     await apiRequest(`/tasks/${id}`, "PATCH",{title});
-    
+
     setTasks((prev) =>prev.map((task) =>task._id === id ? { ...task, title } : task));
     
   } catch (err) {
@@ -54,7 +54,7 @@ export default function DashboardPage() {
   // Delete task locally without backend call
   const handleDelete = async (taskId: string) => {
     try {
-      const data =  await apiRequest(`/tasks/${taskId}`,"DELETE");
+       await apiRequest(`/tasks/${taskId}`,"DELETE");
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
     } catch (err: any) {
       console.error(err.message);

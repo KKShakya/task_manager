@@ -32,9 +32,10 @@ export default function LoginPage() {
     } else {
       initializeGoogleSignIn();
     }
-  }, []);
 
+  }, []);
   // Initialize Google sign-in button
+
   const initializeGoogleSignIn = () => {
     /* global google */
     if (!window.google) return;
