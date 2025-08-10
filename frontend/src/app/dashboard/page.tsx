@@ -35,6 +35,17 @@ export default function DashboardPage() {
   }
 };
 
+ const onUpdateTitle = async (id:string,title:string) =>{
+  try {
+    await apiRequest(`/tasks/${id}`, "PATCH",{title});
+    
+    setTasks((prev) =>prev.map((task) =>task._id === id ? { ...task, title } : task));
+    
+  } catch (err) {
+    console.error("Failed to update title", err);
+  }
+ }
+
 
   useEffect(() => {
     fetchTasks();
@@ -74,7 +85,7 @@ export default function DashboardPage() {
           No tasks yet. Add one above 👆
         </p>
       ) : (
-        <TaskList tasks={tasks} onDelete={handleDelete} onChangeStatus={onChangeStatus}/>
+        <TaskList tasks={tasks} onDelete={handleDelete} onChangeStatus={onChangeStatus} onUpdateTitle={onUpdateTitle}/>
       )}
     </main>
   );

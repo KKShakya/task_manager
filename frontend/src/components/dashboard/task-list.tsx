@@ -38,23 +38,47 @@ export default function TaskList({
   tasks,
   onDelete,
   onChangeStatus,
+  onUpdateTitle,
 }: {
   tasks: any[];
   onDelete: (id: string) => void;
   onChangeStatus: (id: string, completed: boolean) => void;
+  onUpdateTitle: (id: string, newTitle: string) => void;
 }) {
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
 
   const TaskPopup = ({
     task,
     onClose,
+    onChangeStatus,
+    onDelete,
+    onUpdateTitle,
   }: {
     task: any;
     onClose: () => void;
+    onChangeStatus: (id: string, completed: boolean) => void;
+    onDelete: (id: string) => void;
+    onUpdateTitle: (id: string, newTitle: string) => void;
   }) => {
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [titleInput, setTitleInput] = useState(task.title);
+
+    const saveTitle = () => {
+      if (titleInput.trim() === "") return; // prevent empty title
+      if (titleInput !== task.title) {
+        onUpdateTitle(task._id, titleInput.trim());
+      }
+      setIsEditingTitle(false);
+    };
+
+    const cancelEdit = () => {
+      setTitleInput(task.title);
+      setIsEditingTitle(false);
+    };
+
     return (
       <div
-        className="fixed inset-0  bg-opacity-100 flex justify-center items-center z-50 backdrop-blur"
+        className="fixed inset-0 bg-opacity-100 flex justify-center items-center z-50 backdrop-blur"
         onClick={onClose}
       >
         <Card
@@ -62,13 +86,49 @@ export default function TaskList({
           onClick={(e) => e.stopPropagation()}
         >
           <CardHeader className="flex justify-between items-center mb-2 ">
-            <CardTitle className="text-xl">{task.title}</CardTitle>
-            <Button variant="ghost" size="sm" className="absolute top-2 right-2" onClick={onClose} aria-label="Close">
+            {/* Editable Title */}
+            {isEditingTitle ? (
+              <div className="flex flex-col  space-x-2 w-full">
+                <input
+                  type="text"
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  className="flex-grow border rounded px-2 py-1 text-lg font-semibold"
+                  autoFocus
+                />
+               <div className="flex mt-2 ml-auto gap-2">
+                 <Button size="sm" onClick={saveTitle}>
+                  Save
+                </Button>
+                <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                  Cancel
+                </Button>
+               </div>
+              </div>
+            ) : (
+              <h2
+                className="text-xl font-semibold cursor-pointer"
+                onClick={() => setIsEditingTitle(true)}
+                title="Click to edit title"
+              >
+                {task.title}
+              </h2>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={onClose}
+              aria-label="Close"
+            >
               ✕
             </Button>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">Status: {task.completed ? "✅ Done" : "⏳ Pending"}</p>
+            <p className="mb-4">
+              Status: {task.completed ? "✅ Done" : "⏳ Pending"}
+            </p>
 
             <Popover>
               <PopoverTrigger asChild>
@@ -170,6 +230,12 @@ export default function TaskList({
         <TaskPopup
           task={tasks.find((t) => t._id === openTaskId)!}
           onClose={() => setOpenTaskId(null)}
+          onChangeStatus={onChangeStatus}
+          onDelete={onDelete}
+          onUpdateTitle={(id, newTitle) => {
+            onUpdateTitle(id, newTitle);
+            setOpenTaskId(null); // close popup after saving title
+          }}
         />
       )}
     </>

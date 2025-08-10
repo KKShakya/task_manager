@@ -55,7 +55,15 @@ exports.updateTask = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found or unauthorized" });
     }
-     task.completed = req.body.completed
+      if ("completed" in req.body) {
+      task.completed = req.body.completed;
+    }
+    if ("title" in req.body) {
+      if (typeof req.body.title !== "string" || !req.body.title.trim()) {
+        return res.status(400).json({ message: "Invalid title" });
+      }
+      task.title = req.body.title.trim();
+    }
     await task.save();
 
     res.json({ message: "Task status updated succesfully" });
