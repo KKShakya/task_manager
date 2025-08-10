@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,55 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Load Google Identity Services script dynamically
+  useEffect(() => {
+    const scriptId = "google-identity";
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.id = scriptId;
+      document.body.appendChild(script);
+      script.onload = initializeGoogleSignIn;
+    } else {
+      initializeGoogleSignIn();
+    }
+  }, []);
+
+  // Initialize Google sign-in button
+  const initializeGoogleSignIn = () => {
+    /* global google */
+    if (!window.google) return;
+
+    google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+      callback: handleGoogleCredentialResponse,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("google-signin")!,
+      { theme: "outline", size: "large", width: 280 }
+    );
+  };
+
+  // Called after Google Sign-In, sends idToken to backend
+  const handleGoogleCredentialResponse = async (response: any) => {
+    const idToken = response.credential;
+
+    try {
+      setLoading(true);
+      const res = await apiRequest("/auth/google", "POST", { idToken });
+      localStorage.setItem("token", res.token);
+      toast.success("Login successful (Google)");
+      router.push("/");
+    } catch (err: any) {
+      toast.error(err.message || "Google login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -72,6 +121,10 @@ export default function LoginPage() {
         <Button className="w-full" onClick={handleLogin} disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </Button>
+
+        <div className="flex justify-center my-4">
+          <div id="google-signin"></div>
+        </div>
 
         <p className="text-sm text-center">
           Don&apos;t have an account?{" "}
