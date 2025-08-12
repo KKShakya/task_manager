@@ -1,5 +1,5 @@
-# Use official Node.js image
-FROM node:18-alpine
+# Use official Node.js Debian-based image
+FROM node:18-bullseye
 
 # Set working directory
 WORKDIR /app
@@ -12,6 +12,8 @@ RUN npm install
 COPY . .
 
 # Build the Next.js app
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 RUN npm run build
 
 # Expose port 3000

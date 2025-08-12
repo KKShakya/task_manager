@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   }, []);
   // Initialize Google sign-in button
-
+console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
   const initializeGoogleSignIn = () => {
     /* global google */
     if (!window.google) return;
@@ -54,6 +54,9 @@ export default function LoginPage() {
   // Called after Google Sign-In, sends idToken to backend
   const handleGoogleCredentialResponse = async (response: any) => {
     const idToken = response.credential;
+    
+    console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
+    
 
     try {
       setLoading(true);

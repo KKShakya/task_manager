@@ -9,8 +9,8 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL, // frontend URL
-  credentials: true                // allow cookies/auth headers if needed
+  origin: '*', // frontend URL
+  credentials: true                
 }));
 
 // Routes
