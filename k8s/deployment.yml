@@ -28,6 +28,8 @@ spec:
                 secretKeyRef:
                   name: task-manager-secrets
                   key: MONGO_URI
+                  key: JWT_SECRET
+                  key: GOOGLE_CLIENT_ID
           resources:
             requests:
               cpu: "100m"
