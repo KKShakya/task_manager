@@ -31,4 +31,3 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/task-manager-backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/task-manager-frontend:latest
-
